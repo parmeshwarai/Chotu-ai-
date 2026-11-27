@@ -1,0 +1,334 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Registered Chhotu AI user profile, subscription plan, credit balances, and video generation quotas (seconds & counts).",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "maxLength": 200 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "photoURL": { "type": "string", "maxLength": 500 },
+        "plan": { "type": "string", "enum": ["free", "basic", "standard", "pro", "premium", "ultra"] },
+        "subscriptionStatus": { "type": "string", "enum": ["active", "expired", "cancelled"] },
+        "subscriptionExpiresAt": { "type": "string", "maxLength": 64 },
+        "banned": { "type": "boolean" },
+        "imageCredits": { "type": "number" },
+        "videoCredits": { "type": "number" },
+        "musicCredits": { "type": "number" },
+        "dailyVideoLimit": { "type": "number" },
+        "monthlyVideoLimit": { "type": "number" },
+        "dailyVideosUsed": { "type": "number" },
+        "monthlyVideosUsed": { "type": "number" },
+        "singleVideoLimitSec": { "type": "number" },
+        "dailyVideoLimitSec": { "type": "number" },
+        "monthlyVideoLimitSec": { "type": "number" },
+        "dailyVideoSecondsUsed": { "type": "number" },
+        "monthlyVideoSecondsUsed": { "type": "number" },
+        "lastDailyReset": { "type": "string", "maxLength": 32 },
+        "lastMonthlyReset": { "type": "string", "maxLength": 32 },
+        "lastTxId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "preferredLanguage": { "type": "string", "enum": ["auto", "hi", "en", "bho"] },
+        "voiceEnabled": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "uid", "email", "displayName", "plan", "banned",
+        "imageCredits", "videoCredits", "musicCredits",
+        "dailyVideoLimit", "monthlyVideoLimit", "dailyVideosUsed", "monthlyVideosUsed",
+        "lastDailyReset", "lastMonthlyReset", "preferredLanguage", "voiceEnabled",
+        "createdAt", "updatedAt"
+      ]
+    },
+    "AdminMarker": {
+      "title": "AdminMarker",
+      "description": "Server/admin-controlled marker granting administrative privileges to a UID.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "maxLength": 200 },
+        "grantedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "grantedAt"]
+    },
+    "ChatSession": {
+      "title": "ChatSession",
+      "description": "Persistent AI chat thread belonging to a specific user.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 140 },
+        "mode": { "type": "string", "enum": ["chat", "coding", "script", "search", "document"] },
+        "language": { "type": "string", "maxLength": 16 },
+        "model": { "type": "string", "maxLength": 80 },
+        "messageCount": { "type": "number" },
+        "lastMessagePreview": { "type": "string", "maxLength": 300 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title", "mode", "language", "model", "messageCount", "lastMessagePreview", "createdAt", "updatedAt"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Individual message inside a user's chat session.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "chatId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "role": { "type": "string", "enum": ["user", "assistant"] },
+        "content": { "type": "string", "maxLength": 50000 },
+        "model": { "type": "string", "maxLength": 80 },
+        "attachmentName": { "type": "string", "maxLength": 200 },
+        "sourcesCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "chatId", "userId", "role", "content", "model", "createdAt"]
+    },
+    "UserMemory": {
+      "title": "UserMemory",
+      "description": "User-controlled AI long-term memory entry.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "content": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "category": { "type": "string", "enum": ["preference", "fact", "project", "style"] },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "content", "category", "active", "createdAt", "updatedAt"]
+    },
+    "MediaHistoryItem": {
+      "title": "MediaHistoryItem",
+      "description": "Metadata and file URL for generated images, videos, and music.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "type": { "type": "string", "enum": ["image", "video", "music"] },
+        "mode": { "type": "string", "maxLength": 40 },
+        "prompt": { "type": "string", "minLength": 1, "maxLength": 4000 },
+        "style": { "type": "string", "maxLength": 100 },
+        "model": { "type": "string", "maxLength": 100 },
+        "aspectRatio": { "type": "string", "maxLength": 20 },
+        "quality": { "type": "string", "maxLength": 20 },
+        "duration": { "type": "string", "maxLength": 20 },
+        "durationSec": { "type": "number" },
+        "status": { "type": "string", "enum": ["completed", "failed", "partial_failed"] },
+        "creditsCost": { "type": "number" },
+        "apiCostInr": { "type": "number" },
+        "refunded": { "type": "boolean" },
+        "mediaUrl": { "type": "string", "maxLength": 500 },
+        "subtitleUrl": { "type": "string", "maxLength": 500 },
+        "mimeType": { "type": "string", "maxLength": 80 },
+        "lyrics": { "type": "string", "maxLength": 5000 },
+        "errorMessage": { "type": "string", "maxLength": 600 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "type", "prompt", "style", "model", "status", "creditsCost", "refunded", "createdAt"]
+    },
+    "VideoJob": {
+      "title": "VideoJob",
+      "description": "Long/scene-based AI video generation job state, progress, scene metadata, and cost record.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "mode": { "type": "string", "enum": ["text_to_video", "image_to_video"] },
+        "prompt": { "type": "string", "minLength": 1, "maxLength": 4000 },
+        "style": { "type": "string", "maxLength": 60 },
+        "aspectRatio": { "type": "string", "maxLength": 20 },
+        "quality": { "type": "string", "maxLength": 20 },
+        "model": { "type": "string", "maxLength": 100 },
+        "durationSec": { "type": "number" },
+        "status": { "type": "string", "enum": ["queued", "processing", "completed", "partial_failed", "failed"] },
+        "progressPct": { "type": "number" },
+        "etaSeconds": { "type": "number" },
+        "totalScenes": { "type": "number" },
+        "completedScenes": { "type": "number" },
+        "creditsReserved": { "type": "number" },
+        "creditsRefunded": { "type": "number" },
+        "estimatedApiCostInr": { "type": "number" },
+        "finalVideoUrl": { "type": "string", "maxLength": 500 },
+        "subtitleUrl": { "type": "string", "maxLength": 500 },
+        "errorMessage": { "type": "string", "maxLength": 600 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id", "userId", "mode", "prompt", "style", "aspectRatio", "quality", "model",
+        "durationSec", "status", "progressPct", "etaSeconds", "totalScenes", "completedScenes",
+        "creditsReserved", "creditsRefunded", "estimatedApiCostInr", "createdAt", "updatedAt"
+      ]
+    },
+    "PaymentRecord": {
+      "title": "PaymentRecord",
+      "description": "Verified UPI/Gateway payment order, invoice, and refund tracking.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userEmail": { "type": "string", "maxLength": 200 },
+        "planId": { "type": "string", "enum": ["basic", "standard", "pro", "premium", "ultra"] },
+        "amountInr": { "type": "number" },
+        "gateway": { "type": "string", "maxLength": 40 },
+        "orderId": { "type": "string", "maxLength": 128 },
+        "paymentId": { "type": "string", "maxLength": 128 },
+        "invoiceNumber": { "type": "string", "maxLength": 64 },
+        "status": { "type": "string", "enum": ["pending", "paid", "failed", "refunded"] },
+        "errorMessage": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "userEmail", "planId", "amountInr", "gateway", "orderId", "invoiceNumber", "status", "createdAt", "updatedAt"]
+    },
+    "CreditTransaction": {
+      "title": "CreditTransaction",
+      "description": "Immutable idempotent ledger record for credit deductions, refunds, and admin grants.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "creditType": { "type": "string", "enum": ["image", "video", "music"] },
+        "action": { "type": "string", "enum": ["deduct", "refund", "admin_grant", "signup_bonus", "plan_credit"] },
+        "delta": { "type": "number" },
+        "balanceAfter": { "type": "number" },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "jobId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "creditType", "action", "delta", "balanceAfter", "reason", "jobId", "createdAt"]
+    },
+    "SystemConfig": {
+      "title": "SystemConfig",
+      "description": "Global admin-managed feature flags, AI model toggles, video quality toggles, and subscription plan pricing/limits.",
+      "type": "object",
+      "properties": {
+        "freeDailyVideoLimit": { "type": "number" },
+        "freeMonthlyVideoLimit": { "type": "number" },
+        "premiumDailyVideoLimit": { "type": "number" },
+        "premiumMonthlyVideoLimit": { "type": "number" },
+        "dailyResetHourIST": { "type": "number" },
+        "costAlertThresholdInr": { "type": "number" },
+        "featureChat": { "type": "boolean" },
+        "featureVoice": { "type": "boolean" },
+        "featureMemory": { "type": "boolean" },
+        "featureImage": { "type": "boolean" },
+        "featureVideo": { "type": "boolean" },
+        "featureTextToVideo": { "type": "boolean" },
+        "featureImageToVideo": { "type": "boolean" },
+        "featureMusic": { "type": "boolean" },
+        "featureScript": { "type": "boolean" },
+        "featureDocument": { "type": "boolean" },
+        "featureSearch": { "type": "boolean" },
+        "featureCoding": { "type": "boolean" },
+        "featureAppTesting": { "type": "boolean" },
+        "modelHydrogen": { "type": "boolean" },
+        "modelNeon": { "type": "boolean" },
+        "modelImage": { "type": "boolean" },
+        "modelVideo": { "type": "boolean" },
+        "modelMusic": { "type": "boolean" },
+        "quality480p": { "type": "boolean" },
+        "quality720p": { "type": "boolean" },
+        "quality1080p": { "type": "boolean" },
+        "quality4k": { "type": "boolean" },
+        "planConfigsJson": { "type": "string", "maxLength": 10000 },
+        "updatedBy": { "type": "string", "maxLength": 200 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "freeDailyVideoLimit", "freeMonthlyVideoLimit", "premiumDailyVideoLimit", "premiumMonthlyVideoLimit",
+        "featureChat", "featureVoice", "featureMemory", "featureImage", "featureVideo", "featureMusic",
+        "featureScript", "featureDocument", "featureSearch", "featureCoding", "featureAppTesting",
+        "modelHydrogen", "modelNeon", "modelImage", "modelVideo", "modelMusic", "updatedBy", "updatedAt"
+      ]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Immutable security and administrative action log.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "actorUid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "actorEmail": { "type": "string", "maxLength": 200 },
+        "action": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "targetId": { "type": "string", "maxLength": 128 },
+        "details": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "actorUid", "actorEmail", "action", "targetId", "details", "createdAt"]
+    },
+    "BharatTubeCheck": {
+      "title": "BharatTubeCheck",
+      "description": "Saved diagnostic probe record from the BharatTube App Testing Assistant.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "targetUrl": { "type": "string", "maxLength": 300 },
+        "serverStatus": { "type": "string", "maxLength": 80 },
+        "dbStatus": { "type": "string", "maxLength": 80 },
+        "uploadTestStatus": { "type": "string", "maxLength": 80 },
+        "playbackTestStatus": { "type": "string", "maxLength": 80 },
+        "admobStatus": { "type": "string", "maxLength": 80 },
+        "errorReport": { "type": "string", "maxLength": 2000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "targetUrl", "serverStatus", "dbStatus", "uploadTestStatus", "playbackTestStatus", "admobStatus", "errorReport", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Private user account profiles, subscription tier, credit balances, and daily/monthly video limits."
+    },
+    "/admins/{userId}": {
+      "schema": { "$ref": "#/entities/AdminMarker" },
+      "description": "Admin role markers controlled exclusively by admins."
+    },
+    "/chats/{chatId}": {
+      "schema": { "$ref": "#/entities/ChatSession" },
+      "description": "User chat threads across Chat, Coding, Script, Search, and Document tools."
+    },
+    "/chats/{chatId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/ChatMessage" },
+      "description": "Messages belonging to a parent ChatSession."
+    },
+    "/memories/{memoryId}": {
+      "schema": { "$ref": "#/entities/UserMemory" },
+      "description": "Long-term AI memories scoped to individual users."
+    },
+    "/mediaHistory/{mediaId}": {
+      "schema": { "$ref": "#/entities/MediaHistoryItem" },
+      "description": "Generated image, video, and music history metadata."
+    },
+    "/videoJobs/{jobId}": {
+      "schema": { "$ref": "#/entities/VideoJob" },
+      "description": "Scene-based video generation jobs, progress, ETA, and cost telemetry."
+    },
+    "/payments/{paymentId}": {
+      "schema": { "$ref": "#/entities/PaymentRecord" },
+      "description": "Subscription UPI/Gateway payment records, invoices, and refunds."
+    },
+    "/creditTransactions/{txId}": {
+      "schema": { "$ref": "#/entities/CreditTransaction" },
+      "description": "Immutable idempotent credit transaction ledger."
+    },
+    "/systemConfig/{configId}": {
+      "schema": { "$ref": "#/entities/SystemConfig" },
+      "description": "Global platform configuration for feature toggles, model toggles, quality switches, and plan limits."
+    },
+    "/auditLogs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLog" },
+      "description": "Immutable security and admin audit trail."
+    },
+    "/bharatTubeChecks/{checkId}": {
+      "schema": { "$ref": "#/entities/BharatTubeCheck" },
+      "description": "BharatTube integration diagnostic logs."
+    }
+  }
+}

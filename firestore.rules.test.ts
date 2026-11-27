@@ -1,0 +1,97 @@
+/**
+ * Security Rule Verification Suite for Chhotu AI (Dirty Dozen Payloads)
+ * Run with @firebase/rules-unit-testing against Firestore Emulator when available.
+ */
+export const dirtyDozenPayloads = [
+  {
+    name: '1. Unauthenticated read on /users/user123',
+    path: 'users/user123',
+    operation: 'get',
+    auth: null,
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    name: '2. Non-owner PII read on /users/otherUser123',
+    path: 'users/otherUser123',
+    operation: 'get',
+    auth: { uid: 'attacker1', email: 'attacker@example.com', email_verified: true },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    name: '3. Self-escalation on /users/attacker1 create with premium plan',
+    path: 'users/attacker1',
+    operation: 'create',
+    auth: { uid: 'attacker1', email: 'attacker@example.com', email_verified: true },
+    payload: { uid: 'attacker1', plan: 'premium', imageCredits: 99999 },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    name: '4. Self-escalation updating dailyVideoLimit without Admin role',
+    path: 'users/attacker1',
+    operation: 'update',
+    auth: { uid: 'attacker1', email: 'attacker@example.com', email_verified: true },
+    payload: { dailyVideoLimit: 500 },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    name: '5. Unverified email spoofing admin email',
+    path: 'systemConfig/global',
+    operation: 'update',
+    auth: { uid: 'spoof1', email: 'cchotumarapo@gmail.com', email_verified: false },
+    payload: { freeDailyVideoLimit: 99 },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    name: '6. Ghost field injection (isAdmin: true) in /users/attacker1',
+    path: 'users/attacker1',
+    operation: 'create',
+    auth: { uid: 'attacker1', email: 'attacker@example.com', email_verified: true },
+    payload: { uid: 'attacker1', isAdmin: true },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    name: '7. Client-forged timestamp on /chats/chat1',
+    path: 'chats/chat1',
+    operation: 'create',
+    auth: { uid: 'user1', email: 'user1@example.com', email_verified: true },
+    payload: { id: 'chat1', userId: 'user1', createdAt: '2020-01-01T00:00:00Z' },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    name: '8. Oversized ID poisoning on /chats',
+    path: `chats/${'a'.repeat(500)}`,
+    operation: 'create',
+    auth: { uid: 'user1', email: 'user1@example.com', email_verified: true },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    name: '9. Orphaned message creation under another user chat',
+    path: 'chats/victimChat/messages/msg1',
+    operation: 'create',
+    auth: { uid: 'attacker1', email: 'attacker@example.com', email_verified: true },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    name: '10. Unscoped blanket list on /chats without userId filter',
+    path: 'chats',
+    operation: 'list',
+    auth: { uid: 'user1', email: 'user1@example.com', email_verified: true },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    name: '11. Mutating an immutable credit transaction record',
+    path: 'creditTransactions/deduct_job1',
+    operation: 'update',
+    auth: { uid: 'user1', email: 'user1@example.com', email_verified: true },
+    payload: { delta: 1000 },
+    expected: 'PERMISSION_DENIED',
+  },
+  {
+    name: '12. Non-admin updating global systemConfig',
+    path: 'systemConfig/global',
+    operation: 'update',
+    auth: { uid: 'user1', email: 'user1@example.com', email_verified: true },
+    payload: { featureVideo: false },
+    expected: 'PERMISSION_DENIED',
+  },
+];

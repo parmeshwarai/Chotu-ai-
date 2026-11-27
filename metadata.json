@@ -1,0 +1,6 @@
+{
+  "name": "Chhotu AI",
+  "description": "Advanced multi-feature AI assistant with multilingual chat, voice AI, persistent memory, media studios, script & coding tools, internet search, document assistant, credit system, and BharatTube integration.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
